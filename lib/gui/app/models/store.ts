@@ -402,6 +402,10 @@ function storeReducer(
 		case Actions.SELECT_SOURCE: {
 			// Type: action.data : ImageObject
 
+			console.log("heyyyyy",state.get(['selection',"image"]));
+			console.log("action-state",action);
+			
+
 			if (!action.data.drive) {
 				verifyNoNilFields(action.data, selectImageNoNilFields, 'image');
 			}

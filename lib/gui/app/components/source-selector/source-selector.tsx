@@ -73,48 +73,48 @@ import type {
 } from '../../../../shared/typings/source-selector';
 import * as i18next from 'i18next';
 
-const recentUrlImagesKey = 'recentUrlImages';
+// const recentUrlImagesKey = 'recentUrlImages';
 
-function normalizeRecentUrlImages(urls: any[]): URL[] {
-	if (!Array.isArray(urls)) {
-		urls = [];
-	}
-	urls = urls
-		.map((url) => {
-			try {
-				return new URL(url);
-			} catch (error: any) {
-				// Invalid URL, skip
-			}
-		})
-		.filter((url) => url !== undefined);
-	urls = uniqBy(urls, (url) => url.href);
-	return urls.slice(urls.length - 5);
-}
+// function normalizeRecentUrlImages(urls: any[]): URL[] {
+// 	if (!Array.isArray(urls)) {
+// 		urls = [];
+// 	}
+// 	urls = urls
+// 		.map((url) => {
+// 			try {
+// 				return new URL(url);
+// 			} catch (error: any) {
+// 				// Invalid URL, skip
+// 			}
+// 		})
+// 		.filter((url) => url !== undefined);
+// 	urls = uniqBy(urls, (url) => url.href);
+// 	return urls.slice(urls.length - 5);
+// }
 
-function getRecentUrlImages(): URL[] {
-	let urls = [];
-	try {
-		urls = JSON.parse(localStorage.getItem(recentUrlImagesKey) || '[]');
-	} catch {
-		// noop
-	}
-	return normalizeRecentUrlImages(urls);
-}
+// function getRecentUrlImages(): URL[] {
+// 	let urls = [];
+// 	try {
+// 		urls = JSON.parse(localStorage.getItem(recentUrlImagesKey) || '[]');
+// 	} catch {
+// 		// noop
+// 	}
+// 	return normalizeRecentUrlImages(urls);
+// }
 
-function setRecentUrlImages(urls: URL[]) {
-	const normalized = normalizeRecentUrlImages(urls.map((url: URL) => url.href));
-	localStorage.setItem(recentUrlImagesKey, JSON.stringify(normalized));
-}
+// function setRecentUrlImages(urls: URL[]) {
+// 	const normalized = normalizeRecentUrlImages(urls.map((url: URL) => url.href));
+// 	localStorage.setItem(recentUrlImagesKey, JSON.stringify(normalized));
+// }
 
 const isURL = (imagePath: string) =>
 	imagePath.startsWith('https://') || imagePath.startsWith('http://');
 
-const Card = styled(BaseCard)`
-	hr {
-		margin: 5px 0;
-	}
-`;
+// const Card = styled(BaseCard)`
+// 	hr {
+// 		margin: 5px 0;
+// 	}
+// `;
 
 // TODO move these styles to rendition
 const ModalText = styled.p`
@@ -140,174 +140,175 @@ function isString(value: any): value is string {
 	return typeof value === 'string';
 }
 
-const URLSelector = ({
-	done,
-	cancel,
-}: {
-	done: (imageURL: string, auth?: Authentication) => void;
-	cancel: () => void;
-}) => {
-	const [imageURL, setImageURL] = React.useState('');
-	const [recentImages, setRecentImages] = React.useState<URL[]>([]);
-	const [loading, setLoading] = React.useState(false);
-	const [showBasicAuth, setShowBasicAuth] = React.useState(false);
-	const [username, setUsername] = React.useState('');
-	const [password, setPassword] = React.useState('');
-	React.useEffect(() => {
-		const fetchRecentUrlImages = async () => {
-			const recentUrlImages: URL[] = await getRecentUrlImages();
-			setRecentImages(recentUrlImages);
-		};
-		fetchRecentUrlImages();
-	}, []);
-	return (
-		<Modal
-			cancel={cancel}
-			primaryButtonProps={{
-				disabled: loading || !imageURL,
-			}}
-			action={loading ? <Spinner /> : i18next.t('ok')}
-			done={async () => {
-				setLoading(true);
-				const urlStrings = recentImages.map((url: URL) => url.href);
-				const normalizedRecentUrls = normalizeRecentUrlImages([
-					...urlStrings,
-					imageURL,
-				]);
-				setRecentUrlImages(normalizedRecentUrls);
-				const auth = username ? { username, password } : undefined;
-				await done(imageURL, auth);
-			}}
-		>
-			<Flex flexDirection="column">
-				<Flex mb={15} style={{ width: '100%' }} flexDirection="column">
-					<Txt mb="10px" fontSize="24px">
-						{i18next.t('source.useSourceURL')}
-					</Txt>
-					<Input
-						value={imageURL}
-						placeholder={i18next.t('source.enterValidURL')}
-						type="text"
-						onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-							setImageURL(evt.target.value)
-						}
-					/>
-					<Link
-						mt={15}
-						mb={15}
-						fontSize="14px"
-						onClick={() => {
-							if (showBasicAuth) {
-								setUsername('');
-								setPassword('');
-							}
-							setShowBasicAuth(!showBasicAuth);
-						}}
-					>
-						<Flex alignItems="center">
-							{showBasicAuth && (
-								<ChevronDownSvg height="1em" fill="currentColor" />
-							)}
-							{!showBasicAuth && (
-								<ChevronRightSvg height="1em" fill="currentColor" />
-							)}
-							<Txt ml={8}>{i18next.t('source.auth')}</Txt>
-						</Flex>
-					</Link>
-					{showBasicAuth && (
-						<React.Fragment>
-							<Input
-								mb={15}
-								value={username}
-								placeholder={i18next.t('source.username')}
-								type="text"
-								onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-									setUsername(evt.target.value)
-								}
-							/>
-							<Input
-								value={password}
-								placeholder={i18next.t('source.password')}
-								type="password"
-								onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
-									setPassword(evt.target.value)
-								}
-							/>
-						</React.Fragment>
-					)}
-				</Flex>
-				{recentImages.length > 0 && (
-					<Flex flexDirection="column" height="78.6%">
-						<Txt fontSize={18}>Recent</Txt>
-						<ScrollableFlex flexDirection="column">
-							<Card
-								p="10px 15px"
-								rows={recentImages
-									.map((recent) => (
-										<Txt
-											key={recent.href}
-											onClick={() => {
-												setImageURL(recent.href);
-											}}
-											style={{
-												overflowWrap: 'break-word',
-											}}
-										>
-											{recent.pathname.split('/').pop()} - {recent.href}
-										</Txt>
-									))
-									.reverse()}
-							/>
-						</ScrollableFlex>
-					</Flex>
-				)}
-			</Flex>
-		</Modal>
-	);
-};
+// const URLSelector = ({
+// 	done,
+// 	cancel,
+// }: {
+// 	done: (imageURL: string, auth?: Authentication) => void;
+// 	cancel: () => void;
+// }) => {
+// 	const [imageURL, setImageURL] = React.useState('');
+// 	const [recentImages, setRecentImages] = React.useState<URL[]>([]);
+// 	const [loading, setLoading] = React.useState(false);
+// 	const [showBasicAuth, setShowBasicAuth] = React.useState(false);
+// 	const [username, setUsername] = React.useState('');
+// 	const [password, setPassword] = React.useState('');
+// 	React.useEffect(() => {
+// 		const fetchRecentUrlImages = async () => {
+// 			const recentUrlImages: URL[] = await getRecentUrlImages();
+// 			setRecentImages(recentUrlImages);
+// 		};
+// 		fetchRecentUrlImages();
+// 	}, []);
+// 	return (
+// 		<Modal
+// 			cancel={cancel}
+// 			primaryButtonProps={{
+// 				disabled: loading || !imageURL,
+// 			}}
+// 			action={loading ? <Spinner /> : i18next.t('ok')}
+// 			done={async () => {
+// 				setLoading(true);
+// 				const urlStrings = recentImages.map((url: URL) => url.href);
+// 				const normalizedRecentUrls = normalizeRecentUrlImages([
+// 					...urlStrings,
+// 					imageURL,
+// 				]);
+// 				setRecentUrlImages(normalizedRecentUrls);
+// 				const auth = username ? { username, password } : undefined;
+// 				await done(imageURL, auth);
+// 			}}
+// 		>
+// 			<Flex flexDirection="column">
+// 				<Flex mb={15} style={{ width: '100%' }} flexDirection="column">
+// 					<Txt mb="10px" fontSize="24px">
+// 						{i18next.t('source.useSourceURL')}
+// 					</Txt>
+// 					<Input
+// 						value={imageURL}
+// 						placeholder={i18next.t('source.enterValidURL')}
+// 						type="text"
+// 						onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
+// 							setImageURL(evt.target.value)
+// 						}
+// 					/>
+// 					<Link
+// 						mt={15}
+// 						mb={15}
+// 						fontSize="14px"
+// 						onClick={() => {
+// 							if (showBasicAuth) {
+// 								setUsername('');
+// 								setPassword('');
+// 							}
+// 							setShowBasicAuth(!showBasicAuth);
+// 						}}
+// 					>
+// 						<Flex alignItems="center">
+// 							{showBasicAuth && (
+// 								<ChevronDownSvg height="1em" fill="currentColor" />
+// 							)}
+// 							{!showBasicAuth && (
+// 								<ChevronRightSvg height="1em" fill="currentColor" />
+// 							)}
+// 							<Txt ml={8}>{i18next.t('source.auth')}</Txt>
+// 						</Flex>
+// 					</Link>
+// 					{showBasicAuth && (
+// 						<React.Fragment>
+// 							<Input
+// 								mb={15}
+// 								value={username}
+// 								placeholder={i18next.t('source.username')}
+// 								type="text"
+// 								onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
+// 									setUsername(evt.target.value)
+// 								}
+// 							/>
+// 							<Input
+// 								value={password}
+// 								placeholder={i18next.t('source.password')}
+// 								type="password"
+// 								onChange={(evt: React.ChangeEvent<HTMLInputElement>) =>
+// 									setPassword(evt.target.value)
+// 								}
+// 							/>
+// 						</React.Fragment>
+// 					)}
+// 				</Flex>
+// 				{recentImages.length > 0 && (
+// 					<Flex flexDirection="column" height="78.6%">
+// 						<Txt fontSize={18}>Recent</Txt>
+// 						<ScrollableFlex flexDirection="column">
+// 							<Card
+// 								p="10px 15px"
+// 								rows={recentImages
+// 									.map((recent) => (
+// 										<Txt
+// 											key={recent.href}
+// 											onClick={() => {
+// 												setImageURL(recent.href);
+// 											}}
+// 											style={{
+// 												overflowWrap: 'break-word',
+// 											}}
+// 										>
+// 											{recent.pathname.split('/').pop()} - {recent.href}
+// 										</Txt>
+// 									))
+// 									.reverse()}
+// 							/>
+// 						</ScrollableFlex>
+// 					</Flex>
+// 				)}
+// 			</Flex>
+// 		</Modal>
+// 	);
+// };
 
-interface Flow {
-	icon?: JSX.Element;
-	onClick: (evt: React.MouseEvent) => void;
-	label: string;
-}
+// interface Flow {
+// 	icon?: JSX.Element;
+// 	onClick: (evt: React.MouseEvent) => void;
+// 	label: string;
+// }
 
-const FlowSelector = styled(
-	({ flow, ...props }: { flow: Flow } & ButtonProps) => (
-		<StepButton
-			plain={!props.primary}
-			primary={props.primary}
-			onClick={(evt: React.MouseEvent<Element, MouseEvent>) =>
-				flow.onClick(evt)
-			}
-			icon={flow.icon}
-			{...props}
-		>
-			{flow.label}
-		</StepButton>
-	),
-)`
-	border-radius: 24px;
-	color: rgba(255, 255, 255, 0.7);
+// const FlowSelector = styled(
+// 	({ flow, ...props }: { flow: Flow } & ButtonProps) => (
+// 		<StepButton
+// 			plain={!props.primary}
+// 			primary={props.primary}
+// 			onClick={(evt: React.MouseEvent<Element, MouseEvent>) =>
+// 				flow.onClick(evt)
+// 			}
+// 			icon={flow.icon}
+// 			{...props}
+// 		>
+// 			{flow.label}
+// 		</StepButton>
+// 	),
+// )`
+// 	border-radius: 24px;
+// 	color: rgba(255, 255, 255, 0.7);
 
-	:enabled:focus,
-	:enabled:focus svg {
-		color: ${colors.primary.foreground} !important;
-	}
+// 	:enabled:focus,
+// 	:enabled:focus svg {
+// 		color: ${colors.primary.foreground} !important;
+// 	}
 
-	:enabled:hover {
-		background-color: ${colors.primary.background};
-		color: ${colors.primary.foreground};
-		font-weight: 600;
+// 	:enabled:hover {
+// 		background-color: ${colors.primary.background};
+// 		color: ${colors.primary.foreground};
+// 		font-weight: 600;
 
-		svg {
-			color: ${colors.primary.foreground} !important;
-		}
-	}
-`;
+// 		svg {
+// 			color: ${colors.primary.foreground} !important;
+// 		}
+// 	}
+// `;
 
 interface SourceSelectorProps {
 	flashing: boolean;
+	current:string
 }
 
 interface SourceSelectorState {
@@ -328,6 +329,13 @@ export class SourceSelector extends React.Component<
 	SourceSelectorState
 > {
 	private unsubscribe: (() => void) | undefined;
+	// private defaultImagePath = '/home/vishnu/debian-12.6.0-amd64-netinst.iso';
+	// private defaultImagePath = '/home/vishnu/ubuntu-22.04.4-2024.08.31-desktop-amd64.iso';
+	// private defaultImagePath = '/home/vishnu/Core-current.iso';
+	// private defaultImagePath = '/home/vishnu/isos/debian-12.6.0-amd64-netinst.iso.lz4';
+	private defaultImagePath = '/home/vishnu/isos/ubuntu-22.04.4-2024.08.31-desktop-amd64.iso.lz4';
+
+
 
 	constructor(props: SourceSelectorProps) {
 		super(props);
@@ -343,30 +351,45 @@ export class SourceSelector extends React.Component<
 		};
 
 		// Bind `this` since it's used in an event's callback
-		this.onSelectImage = this.onSelectImage.bind(this);
+		// this.onSelectImage = this.onSelectImage.bind(this);
 	}
 
 	public componentDidMount() {
 		this.unsubscribe = observe(() => {
 			this.setState(getState());
 		});
-		ipcRenderer.on('select-image', this.onSelectImage);
+		// ipcRenderer.on('select-image', this.onSelectImage);
 		ipcRenderer.send('source-selector-ready');
+		this.autoSelectDefaultImage();
 	}
-
+	public componentDidUpdate(prevProps: SourceSelectorProps) {
+		if (prevProps.current !== this.props.current) {
+			this.autoSelectDefaultImage();
+		}
+	}
 	public componentWillUnmount() {
 		this.unsubscribe?.();
-		ipcRenderer.removeListener('select-image', this.onSelectImage);
+		// ipcRenderer.removeListener('select-image', this.onSelectImage);
 	}
 
-	private async onSelectImage(_event: IpcRendererEvent, imagePath: string) {
+	private async autoSelectDefaultImage() {
 		this.setState({ imageLoading: true });
 		await this.selectSource(
-			imagePath,
-			isURL(this.normalizeImagePath(imagePath)) ? 'Http' : 'File',
+			this.defaultImagePath,
+			'File',
 		).promise;
 		this.setState({ imageLoading: false });
 	}
+
+	// private async onSelectImage(_event: IpcRendererEvent, imagePath: string) {
+	// 	return
+	// 	// this.setState({ imageLoading: true });
+	// 	// await this.selectSource(
+	// 	// 	imagePath,
+	// 	// 	isURL(this.normalizeImagePath(imagePath)) ? 'Http' : 'File',
+	// 	// ).promise;
+	// 	// this.setState({ imageLoading: false });
+	// }
 
 	public normalizeImagePath(imgPath: string) {
 		const decodedPath = decodeURIComponent(imgPath);
@@ -381,7 +404,7 @@ export class SourceSelector extends React.Component<
 			previousImage: selectionState.getImage(),
 		});
 
-		selectionState.deselectImage();
+		// selectionState.deselectImage();
 	}
 
 	private selectSource(
@@ -435,12 +458,12 @@ export class SourceSelector extends React.Component<
 
 						if (!metadata?.hasMBR && this.state.warning === null) {
 							analytics.logEvent('Missing partition table', { metadata });
-							this.setState({
-								warning: {
-									message: messages.warning.missingPartitionTable(),
-									title: i18next.t('source.partitionTable'),
-								},
-							});
+							// this.setState({
+							// 	warning: {
+							// 		message: messages.warning.missingPartitionTable(),
+							// 		title: i18next.t('source.partitionTable'),
+							// 	},
+							// });
 						}
 					} catch (error: any) {
 						this.handleError(
@@ -453,12 +476,12 @@ export class SourceSelector extends React.Component<
 				} else {
 					if (selected.partitionTableType === null) {
 						analytics.logEvent('Missing partition table', { selected });
-						this.setState({
-							warning: {
-								message: messages.warning.driveMissingPartitionTable(),
-								title: i18next.t('source.partitionTable'),
-							},
-						});
+						// this.setState({
+						// 	warning: {
+						// 		message: messages.warning.driveMissingPartitionTable(),
+						// 		title: i18next.t('source.partitionTable'),
+						// 	},
+						// });
 					}
 					metadata = {
 						path: selected.device,
@@ -506,25 +529,26 @@ export class SourceSelector extends React.Component<
 		analytics.logEvent(title, { path: sourcePath });
 	}
 
-	private async openImageSelector() {
-		analytics.logEvent('Open image selector');
-		this.setState({ imageSelectorOpen: true });
+	// private async openImageSelector() {
+	// 	return
+	// 	// analytics.logEvent('Open image selector');
+	// 	// this.setState({ imageSelectorOpen: true });
 
-		try {
-			const imagePath = await osDialog.selectImage();
-			// Avoid analytics and selection state changes
-			// if no file was resolved from the dialog.
-			if (!imagePath) {
-				analytics.logEvent('Image selector closed');
-				return;
-			}
-			await this.selectSource(imagePath, 'File').promise;
-		} catch (error: any) {
-			exceptionReporter.report(error);
-		} finally {
-			this.setState({ imageSelectorOpen: false });
-		}
-	}
+	// 	// try {
+	// 	// 	const imagePath = await osDialog.selectImage();
+	// 	// 	// Avoid analytics and selection state changes
+	// 	// 	// if no file was resolved from the dialog.
+	// 	// 	if (!imagePath) {
+	// 	// 		analytics.logEvent('Image selector closed');
+	// 	// 		return;
+	// 	// 	}
+	// 	// 	await this.selectSource(imagePath, 'File').promise;
+	// 	// } catch (error: any) {
+	// 	// 	exceptionReporter.report(error);
+	// 	// } finally {
+	// 	// 	this.setState({ imageSelectorOpen: false });
+	// 	// }
+	// }
 
 	private async onDrop(event: React.DragEvent<HTMLDivElement>) {
 		const file = event.dataTransfer.files.item(0);
@@ -533,21 +557,21 @@ export class SourceSelector extends React.Component<
 		}
 	}
 
-	private openURLSelector() {
-		analytics.logEvent('Open image URL selector');
+	// private openURLSelector() {
+	// 	analytics.logEvent('Open image URL selector');
 
-		this.setState({
-			showURLSelector: true,
-		});
-	}
+	// 	this.setState({
+	// 		showURLSelector: true,
+	// 	});
+	// }
 
-	private openDriveSelector() {
-		analytics.logEvent('Open drive selector');
+	// private openDriveSelector() {
+	// 	analytics.logEvent('Open drive selector');
 
-		this.setState({
-			showDriveSelector: true,
-		});
-	}
+	// 	this.setState({
+	// 		showDriveSelector: true,
+	// 	});
+	// }
 
 	private onDragOver(event: React.DragEvent<HTMLDivElement>) {
 		// Needed to get onDrop events on div elements
@@ -569,23 +593,23 @@ export class SourceSelector extends React.Component<
 		});
 	}
 
-	private setDefaultFlowActive(defaultFlowActive: boolean) {
-		this.setState({ defaultFlowActive });
-	}
+	// private setDefaultFlowActive(defaultFlowActive: boolean) {
+	// 	this.setState({ defaultFlowActive });
+	// }
 
-	private closeModal() {
-		this.setState({
-			showDriveSelector: false,
-		});
-	}
+	// private closeModal() {
+	// 	this.setState({
+	// 		showDriveSelector: false,
+	// 	});
+	// }
 
 	// TODO add a visual change when dragging a file over the selector
 	public render() {
-		const { flashing } = this.props;
+		// const { flashing } = this.props;
 		const {
 			showImageDetails,
-			showURLSelector,
-			showDriveSelector,
+			// showURLSelector,
+			// showDriveSelector,
 			imageLoading,
 		} = this.state;
 		const selectionImage = selectionState.getImage();
@@ -594,9 +618,9 @@ export class SourceSelector extends React.Component<
 
 		image = image.drive ?? image;
 
-		let cancelURLSelection = () => {
-			// noop
-		};
+		// let cancelURLSelection = () => {
+		// 	// noop
+		// };
 		image.name = image.description || image.name;
 		const imagePath = image.path || image.displayName || '';
 		const imageBasename = path.basename(imagePath);
@@ -636,7 +660,7 @@ export class SourceSelector extends React.Component<
 									{middleEllipsis(imageName || imageBasename, 20)}
 								</Spinner>
 							</StepNameButton>
-							{!flashing && !imageLoading && (
+							{/* {!flashing && !imageLoading && (
 								<ChangeButton
 									plain
 									mb={14}
@@ -644,14 +668,15 @@ export class SourceSelector extends React.Component<
 								>
 									{i18next.t('cancel')}
 								</ChangeButton>
-							)}
+							)} */}
 							{!isNil(imageSize) && !imageLoading && (
 								<DetailsText>{prettyBytes(imageSize)}</DetailsText>
 							)}
 						</>
 					) : (
+						// hereeeeeeeeeeeee
 						<>
-							<FlowSelector
+							{/* <FlowSelector
 								disabled={this.state.imageSelectorOpen}
 								primary={this.state.defaultFlowActive}
 								key="Flash from file"
@@ -662,8 +687,8 @@ export class SourceSelector extends React.Component<
 								}}
 								onMouseEnter={() => this.setDefaultFlowActive(false)}
 								onMouseLeave={() => this.setDefaultFlowActive(true)}
-							/>
-							<FlowSelector
+							/> */}
+							{/* <FlowSelector
 								key="Flash from URL"
 								flow={{
 									onClick: () => this.openURLSelector(),
@@ -682,7 +707,7 @@ export class SourceSelector extends React.Component<
 								}}
 								onMouseEnter={() => this.setDefaultFlowActive(false)}
 								onMouseLeave={() => this.setDefaultFlowActive(true)}
-							/>
+							/> */}
 						</>
 					)}
 				</Flex>
@@ -732,7 +757,7 @@ export class SourceSelector extends React.Component<
 					</SmallModal>
 				)}
 
-				{showURLSelector && (
+				{/* {showURLSelector && (
 					<URLSelector
 						cancel={() => {
 							cancelURLSelection();
@@ -775,7 +800,7 @@ export class SourceSelector extends React.Component<
 									this.selectSource(originalSource, 'BlockDevice');
 								}
 							} else {
-								selectionState.deselectImage();
+								// selectionState.deselectImage();
 							}
 							this.closeModal();
 						}}
@@ -785,13 +810,13 @@ export class SourceSelector extends React.Component<
 								if (
 									selectionState.getImage()?.drive?.device === drive?.device
 								) {
-									return selectionState.deselectImage();
+									// return selectionState.deselectImage();
 								}
 								this.selectSource(drive, 'BlockDevice');
 							}
 						}}
 					/>
-				)}
+				)} */}
 			</>
 		);
 	}

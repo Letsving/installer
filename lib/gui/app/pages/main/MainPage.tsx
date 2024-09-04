@@ -44,7 +44,7 @@ import {
 } from '../../components/target-selector/target-selector';
 import { FlashStep } from './Flash';
 
-import EtcherSvg from '../../../assets/etcher.svg';
+import EtcherSvg from '../../../assets/ving_os.svg';
 import { SafeWebview } from '../../components/safe-webview/safe-webview';
 
 const Icon = styled(BaseIcon)`
@@ -174,7 +174,7 @@ export class MainPage extends React.Component<
 			>
 				{notFlashingOrSplitView && (
 					<>
-						<SourceSelector flashing={this.state.isFlashing} />
+						<SourceSelector flashing={this.state.isFlashing} current={this.state.current} />
 						<Flex>
 							<StepBorder disabled={shouldDriveStepBeDisabled} left />
 						</Flex>
@@ -220,7 +220,7 @@ export class MainPage extends React.Component<
 						/>
 					</Flex>
 				)}
-				{this.state.isFlashing && this.state.featuredProjectURL && (
+				{/* {this.state.isFlashing && this.state.featuredProjectURL && (
 					<SafeWebview
 						src={this.state.featuredProjectURL}
 						onWebviewShow={(isWebviewShowing: boolean) => {
@@ -234,7 +234,7 @@ export class MainPage extends React.Component<
 							height: '100vh',
 						}}
 					/>
-				)}
+				)} */}
 
 				<FlashStep
 					width={this.state.isWebviewShowing ? '220px' : '200px'}
@@ -279,27 +279,27 @@ export class MainPage extends React.Component<
 						zIndex: 2,
 					}}
 				>
-					<Flex width="100%" />
+					{/* <Flex width="100%" /> */}
 					<Flex width="100%" alignItems="center" justifyContent="center">
-						<EtcherSvg
-							width="123px"
-							height="22px"
+					 <EtcherSvg
+							// width="123px"
+							// height="22px"
 							style={{
 								cursor: 'pointer',
 							}}
 							onClick={() =>
-								openExternal('https://www.balena.io/etcher?ref=etcher_footer')
+								openExternal('https://www.letsving.com/')
 							}
 							tabIndex={100}
-						/>
+						/> 
 					</Flex>
 
-					<Flex width="100%" alignItems="center" justifyContent="flex-end">
+					{/* <Flex width="100%" alignItems="center" justifyContent="flex-end">
 						<Icon
 							icon={<CogSvg height="1em" fill="currentColor" />}
 							plain
 							tabIndex={5}
-							onClick={() => this.setState({ hideSettings: false })}
+							// onClick={() => this.setState({ hideSettings: true })}
 							style={{
 								// Make touch events click instead of dragging
 								WebkitAppRegion: 'no-drag',
@@ -321,15 +321,15 @@ export class MainPage extends React.Component<
 								}}
 							/>
 						)}
-					</Flex>
+					</Flex> */}
 				</Flex>
-				{this.state.hideSettings ? null : (
+				{/* {this.state.hideSettings ? null : (
 					<SettingsModal
 						toggleModal={(value: boolean) => {
 							this.setState({ hideSettings: !value });
 						}}
 					/>
-				)}
+				)} */}
 				{this.state.current === 'main'
 					? this.renderMain()
 					: this.renderSuccess()}

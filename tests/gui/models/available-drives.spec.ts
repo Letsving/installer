@@ -170,7 +170,7 @@ describe('Model: availableDrives', function () {
 					});
 
 					afterEach(function () {
-						selectionState.deselectImage();
+						// selectionState.deselectImage();
 					});
 
 					it('should not auto-select when there are multiple valid available drives', function () {

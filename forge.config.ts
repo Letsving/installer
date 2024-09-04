@@ -35,7 +35,7 @@ const config: ForgeConfig = {
 		asar: true,
 		icon: './assets/icon',
 		executableName:
-			process.platform === 'linux' ? 'balena-etcher' : 'balenaEtcher',
+			process.platform === 'linux' ? 'ving-flasher' : 'vingFlasher',
 		appBundleId: 'io.balena.etcher',
 		appCategoryType: 'public.app-category.developer-tools',
 		appCopyright: 'Copyright 2016-2023 Balena Ltd',
@@ -60,7 +60,7 @@ const config: ForgeConfig = {
 		new MakerZIP(),
 		new MakerSquirrel({
 			setupIcon: 'assets/icon.ico',
-			loadingGif: 'assets/icon.png',
+			loadingGif: 'assets/ving_os.svg',
 			...winSigningConfig,
 		}),
 		new MakerDMG({
@@ -88,13 +88,13 @@ const config: ForgeConfig = {
 		}),
 		new MakerAppImage({
 			options: {
-				icon: './assets/icon.png',
+				icon: './assets/ving_os.svg',
 				categories: ['Utility'],
 			},
 		}),
 		new MakerRpm({
 			options: {
-				icon: './assets/icon.png',
+				icon: './assets/ving_os.svg',
 				categories: ['Utility'],
 				productDescription,
 				requires: ['util-linux'],
@@ -102,7 +102,7 @@ const config: ForgeConfig = {
 		}),
 		new MakerDeb({
 			options: {
-				icon: './assets/icon.png',
+				icon: './assets/ving_os.svg',
 				categories: ['Utility'],
 				section: 'utils',
 				priority: 'optional',
@@ -141,7 +141,7 @@ const config: ForgeConfig = {
 				// symlink the etcher binary from balena-etcher to balenaEtcher to ensure compatibility with the wdio suite and the old name
 				await new Promise<void>((resolve, reject) => {
 					exec(
-						`ln -s "${options.outputPaths}/balena-etcher" "${options.outputPaths}/balenaEtcher"`,
+						`ln -s "${options.outputPaths}/ving-flasher" "${options.outputPaths}/vingFlasher"`,
 						(err) => {
 							if (err) {
 								reject(err);

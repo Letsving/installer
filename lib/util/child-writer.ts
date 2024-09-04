@@ -30,7 +30,7 @@ import { totalmem } from 'os';
 
 import { cleanupTmpFiles } from 'etcher-sdk/build/tmp';
 
-import type { SourceDestination } from 'etcher-sdk/build/source-destination';
+import { SourceDestination } from 'etcher-sdk/build/source-destination';
 import { File, Http, BlockDevice } from 'etcher-sdk/build/source-destination';
 
 import type { WriteResult, FlashError, WriteOptions } from './types/types';
@@ -40,6 +40,7 @@ import { toJSON } from '../shared/errors';
 import axios from 'axios';
 import { omit } from 'lodash';
 import { emitLog, emitState, emitFail } from './api';
+import { writeVingImage } from './ving-image-writer';
 
 async function write(options: WriteOptions) {
 	/**
@@ -115,12 +116,23 @@ async function write(options: WriteOptions) {
 			}
 		}
 
-		const results = await writeAndValidate({
-			source,
-			destinations: dests,
-			verify: true,
-			autoBlockmapping: options.autoBlockmapping,
-			decompressFirst: options.decompressFirst,
+		// const results = await writeAndValidate({
+		// 	source,
+		// 	destinations: dests,
+		// 	verify: true,
+		// 	autoBlockmapping: options.autoBlockmapping,
+		// 	decompressFirst: options.decompressFirst,
+		// 	onProgress,
+		// 	onFail,
+		// });
+
+		const results = await writeVingImage({
+			inputFilePath: (source as File).path,
+			outputFilePath: dests[0].path,
+			destinations:dests,
+			// verify: true,
+			// autoBlockmapping: options.autoBlockmapping,
+			// decompressFirst: options.decompressFirst,
 			onProgress,
 			onFail,
 		});

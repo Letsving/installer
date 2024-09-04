@@ -111,7 +111,7 @@ export function deselectAllDrives() {
  * @summary Clear selections
  */
 export function clear() {
-	deselectImage();
+	// deselectImage();
 	deselectAllDrives();
 }
 

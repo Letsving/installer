@@ -1,8 +1,8 @@
 {
-  "name": "balena-etcher",
+  "name": "ving-flasher",
   "private": true,
-  "displayName": "balenaEtcher",
-  "productName": "balenaEtcher",
+  "displayName": "vingFlasher",
+  "productName": "vingFlasher",
   "version": "1.19.22",
   "packageType": "local",
   "main": ".webpack/main",

@@ -104,7 +104,7 @@ function FinishPage({ goToMain }: { goToMain: () => void }) {
 					}}
 				/>
 			</Flex>
-			{successBannerURL.length && (
+			{/* {successBannerURL.length && (
 				<SafeWebview
 					src={successBannerURL}
 					onWebviewShow={setWebviewShowing}
@@ -117,7 +117,7 @@ function FinishPage({ goToMain }: { goToMain: () => void }) {
 						height: '100vh',
 					}}
 				/>
-			)}
+			)} */}
 		</Flex>
 	);
 }

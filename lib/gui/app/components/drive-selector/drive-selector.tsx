@@ -183,35 +183,35 @@ export class DriveSelector extends React.Component<
 			image: getImage(),
 			missingDriversModal: defaultMissingDriversModalState,
 			selectedList,
-			showSystemDrives: false,
+			showSystemDrives: true,
 		};
 
 		this.tableColumns = [
-			{
-				field: 'description',
-				label: i18next.t('drives.name'),
-				render: (description: string, drive: Drive) => {
-					if (isDrivelistDrive(drive)) {
-						const isLargeDrive = isDriveSizeLarge(drive);
-						const hasWarnings =
-							this.props.showWarnings && (isLargeDrive || drive.isSystem);
-						return (
-							<Flex alignItems="center">
-								{hasWarnings && (
-									<ExclamationTriangleSvg
-										height="1em"
-										fill={drive.isSystem ? '#fca321' : '#8f9297'}
-									/>
-								)}
-								<Txt ml={(hasWarnings && 8) || 0}>
-									{middleEllipsis(description, 32)}
-								</Txt>
-							</Flex>
-						);
-					}
-					return <Txt>{description}</Txt>;
-				},
-			},
+			// {
+			// 	field: 'description',
+			// 	label: i18next.t('drives.name'),
+			// 	render: (description: string, drive: Drive) => {
+			// 		if (isDrivelistDrive(drive)) {
+			// 			const isLargeDrive = isDriveSizeLarge(drive);
+			// 			const hasWarnings =
+			// 				this.props.showWarnings && (isLargeDrive || drive.isSystem);
+			// 			return (
+			// 				<Flex alignItems="center">
+			// 					{hasWarnings && (
+			// 						<ExclamationTriangleSvg
+			// 							height="1em"
+			// 							fill={drive.isSystem ? '#fca321' : '#8f9297'}
+			// 						/>
+			// 					)}
+			// 					<Txt ml={(hasWarnings && 8) || 0}>
+			// 						{middleEllipsis(description, 32)}
+			// 					</Txt>
+			// 				</Flex>
+			// 			);
+			// 		}
+			// 		return <Txt>{description}</Txt>;
+			// 	},
+			// },
 			{
 				field: 'description',
 				key: 'size',
@@ -219,7 +219,7 @@ export class DriveSelector extends React.Component<
 				render: (_description: string, drive: Drive) => {
 					if (isDrivelistDrive(drive) && drive.size !== null) {
 						return prettyBytes(drive.size);
-					}
+					}	
 				},
 			},
 			{
@@ -379,12 +379,16 @@ export class DriveSelector extends React.Component<
 	componentWillUnmount() {
 		this.unsubscribe?.();
 	}
-
+	private sortDrivesBySize(drives: Drive[]): Drive[] {
+		return drives
+			.filter(isDrivelistDrive) 
+			.sort((a, b) => (b.size || 0) - (a.size || 0)); 
+	}
 	render() {
 		const { cancel, done, ...props } = this.props;
 		const { selectedList, drives, image, missingDriversModal } = this.state;
 
-		const displayedDrives = this.getDisplayedDrives(drives);
+		const displayedDrives = this.sortDrivesBySize(this.getDisplayedDrives(drives));
 		const disabledDrives = this.getDisabledDrives(drives, image);
 		const numberOfSystemDrives = drives.filter(isSystemDrive).length;
 		const numberOfDisplayedSystemDrives =
@@ -513,7 +517,7 @@ export class DriveSelector extends React.Component<
 								});
 							}}
 						/>
-						{numberOfHiddenSystemDrives > 0 && (
+						{/* {numberOfHiddenSystemDrives > 0 && (
 							<Link
 								mt={15}
 								mb={15}
@@ -529,7 +533,7 @@ export class DriveSelector extends React.Component<
 									</Txt>
 								</Flex>
 							</Link>
-						)}
+						)} */}
 					</>
 				)}
 				{this.props.showWarnings && hasSystemDrives ? (
