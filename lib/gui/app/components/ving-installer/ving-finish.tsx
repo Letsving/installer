@@ -1,23 +1,6 @@
-/*
- * Copyright 2019 balena.io
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import * as React from 'react';
 import { Flex } from 'rendition';
 import { v4 as uuidV4 } from 'uuid';
-
 import * as flashState from '../../models/flash-state';
 import * as selectionState from '../../models/selection-state';
 import * as settings from '../../models/settings';
@@ -26,7 +9,6 @@ import * as analytics from '../../modules/analytics';
 import { FlashAnother } from '../flash-another/flash-another';
 import type { FlashError } from '../flash-results/flash-results';
 import { FlashResults } from '../flash-results/flash-results';
-import { SafeWebview } from '../safe-webview/safe-webview';
 
 function restart(goToMain: () => void) {
 	selectionState.deselectAllDrives();
@@ -104,20 +86,6 @@ function FinishPage({ goToMain }: { goToMain: () => void }) {
 					}}
 				/>
 			</Flex>
-			{successBannerURL.length && (
-				<SafeWebview
-					src={successBannerURL}
-					onWebviewShow={setWebviewShowing}
-					style={{
-						display: webviewShowing ? 'flex' : 'none',
-						position: 'absolute',
-						right: 0,
-						bottom: 0,
-						width: '63.8vw',
-						height: '100vh',
-					}}
-				/>
-			)}
 		</Flex>
 	);
 }

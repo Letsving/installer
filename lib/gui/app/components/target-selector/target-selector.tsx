@@ -18,7 +18,7 @@ import * as React from 'react';
 import { Flex, Txt } from 'rendition';
 
 import type { DriveSelectorProps } from '../drive-selector/drive-selector';
-import { DriveSelector } from '../drive-selector/drive-selector';
+import { DriveSelector } from '../ving-installer/ving-drive-selector';
 import {
 	isDriveSelected,
 	getImage,

@@ -35,7 +35,7 @@ const config: ForgeConfig = {
 		asar: true,
 		icon: './assets/icon',
 		executableName:
-			process.platform === 'linux' ? 'ving-flasher' : 'vingFlasher',
+			process.platform === 'linux' ? 'ving-installer' : 'vingInstaller',
 		appBundleId: 'io.balena.etcher',
 		appCategoryType: 'public.app-category.developer-tools',
 		appCopyright: 'Copyright 2016-2023 Balena Ltd',
@@ -141,7 +141,7 @@ const config: ForgeConfig = {
 				// symlink the etcher binary from balena-etcher to balenaEtcher to ensure compatibility with the wdio suite and the old name
 				await new Promise<void>((resolve, reject) => {
 					exec(
-						`ln -s "${options.outputPaths}/ving-flasher" "${options.outputPaths}/vingFlasher"`,
+						`ln -s "${options.outputPaths}/ving-installer" "${options.outputPaths}/vingInstaller"`,
 						(err) => {
 							if (err) {
 								reject(err);

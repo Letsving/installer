@@ -1,27 +1,8 @@
-/*
- * Copyright 2019 balena.io
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import ExclamationTriangleSvg from '@fortawesome/fontawesome-free/svgs/solid/triangle-exclamation.svg';
-import ChevronDownSvg from '@fortawesome/fontawesome-free/svgs/solid/chevron-down.svg';
 import type * as sourceDestination from 'etcher-sdk/build/source-destination/';
 import * as React from 'react';
 import type { ModalProps, TableColumn } from 'rendition';
-import { Flex, Txt, Badge, Link } from 'rendition';
+import { Flex, Txt, Badge } from 'rendition';
 import styled from 'styled-components';
-
 import type {
 	DriveStatus,
 	DrivelistDrive,
@@ -29,7 +10,6 @@ import type {
 import {
 	getDriveImageCompatibilityStatuses,
 	isDriveValid,
-	isDriveSizeLarge,
 } from '../../../../shared/drive-constraints';
 import { compatibility, warning } from '../../../../shared/messages';
 import prettyBytes from 'pretty-bytes';
@@ -40,9 +20,7 @@ import { logEvent, logException } from '../../modules/analytics';
 import { open as openExternal } from '../../os/open-external/services/open-external';
 import type { GenericTableProps } from '../../styled-components';
 import { Alert, Modal, Table } from '../../styled-components';
-
 import type { SourceMetadata } from '../../../../shared/typings/source-selector';
-import { middleEllipsis } from '../../utils/middle-ellipsis';
 import * as i18next from 'i18next';
 
 interface UsbbootDrive extends sourceDestination.UsbbootDrive {
@@ -183,35 +161,10 @@ export class DriveSelector extends React.Component<
 			image: getImage(),
 			missingDriversModal: defaultMissingDriversModalState,
 			selectedList,
-			showSystemDrives: false,
+			showSystemDrives: true,
 		};
 
 		this.tableColumns = [
-			{
-				field: 'description',
-				label: i18next.t('drives.name'),
-				render: (description: string, drive: Drive) => {
-					if (isDrivelistDrive(drive)) {
-						const isLargeDrive = isDriveSizeLarge(drive);
-						const hasWarnings =
-							this.props.showWarnings && (isLargeDrive || drive.isSystem);
-						return (
-							<Flex alignItems="center">
-								{hasWarnings && (
-									<ExclamationTriangleSvg
-										height="1em"
-										fill={drive.isSystem ? '#fca321' : '#8f9297'}
-									/>
-								)}
-								<Txt ml={(hasWarnings && 8) || 0}>
-									{middleEllipsis(description, 32)}
-								</Txt>
-							</Flex>
-						);
-					}
-					return <Txt>{description}</Txt>;
-				},
-			},
 			{
 				field: 'description',
 				key: 'size',
@@ -379,18 +332,20 @@ export class DriveSelector extends React.Component<
 	componentWillUnmount() {
 		this.unsubscribe?.();
 	}
-
+	private sortDrivesBySize(drives: Drive[]): Drive[] {
+		return drives
+			.filter(isDrivelistDrive)
+			.sort((a, b) => (b.size || 0) - (a.size || 0));
+	}
 	render() {
 		const { cancel, done, ...props } = this.props;
 		const { selectedList, drives, image, missingDriversModal } = this.state;
 
-		const displayedDrives = this.getDisplayedDrives(drives);
+		const displayedDrives = this.sortDrivesBySize(
+			this.getDisplayedDrives(drives),
+		);
 		const disabledDrives = this.getDisabledDrives(drives, image);
-		const numberOfSystemDrives = drives.filter(isSystemDrive).length;
-		const numberOfDisplayedSystemDrives =
-			displayedDrives.filter(isSystemDrive).length;
-		const numberOfHiddenSystemDrives =
-			numberOfSystemDrives - numberOfDisplayedSystemDrives;
+
 		const hasSystemDrives = selectedList.filter(isSystemDrive).length;
 		const showWarnings = this.props.showWarnings && hasSystemDrives;
 
@@ -513,23 +468,6 @@ export class DriveSelector extends React.Component<
 								});
 							}}
 						/>
-						{numberOfHiddenSystemDrives > 0 && (
-							<Link
-								mt={15}
-								mb={15}
-								fontSize="14px"
-								onClick={() => this.setState({ showSystemDrives: true })}
-							>
-								<Flex alignItems="center">
-									<ChevronDownSvg height="1em" fill="currentColor" />
-									<Txt ml={8}>
-										{i18next.t('drives.showHidden', {
-											num: numberOfHiddenSystemDrives,
-										})}
-									</Txt>
-								</Flex>
-							</Link>
-						)}
 					</>
 				)}
 				{this.props.showWarnings && hasSystemDrives ? (

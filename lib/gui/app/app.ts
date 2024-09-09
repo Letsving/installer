@@ -36,7 +36,7 @@ import { spawnChildAndConnect } from './modules/api';
 import * as exceptionReporter from './modules/exception-reporter';
 import * as osDialog from './os/dialog';
 import * as windowProgress from './os/window-progress';
-import MainPage from './pages/main/MainPage';
+import MainPage from './components/ving-installer/VingMainPage';
 import './css/main.css';
 import * as i18next from 'i18next';
 import type { SourceMetadata } from '../../shared/typings/source-selector';

@@ -1,8 +1,8 @@
 {
-  "name": "ving-flasher",
+  "name": "ving-installer",
   "private": true,
-  "displayName": "vingFlasher",
-  "productName": "vingFlasher",
+  "displayName": "vingInstaller",
+  "productName": "vingInstaller",
   "version": "1.19.22",
   "packageType": "local",
   "main": ".webpack/main",

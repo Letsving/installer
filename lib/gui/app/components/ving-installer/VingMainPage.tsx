@@ -1,55 +1,26 @@
-/*
- * Copyright 2019 balena.io
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import CogSvg from '@fortawesome/fontawesome-free/svgs/solid/gear.svg';
-import QuestionCircleSvg from '@fortawesome/fontawesome-free/svgs/solid/circle-question.svg';
-
 import * as path from 'path';
 import prettyBytes from 'pretty-bytes';
 import * as React from 'react';
 import { Flex } from 'rendition';
 import styled from 'styled-components';
-
-import FinishPage from '../../components/finish/finish';
-import { ReducedFlashingInfos } from '../../components/reduced-flashing-infos/reduced-flashing-infos';
-import { SettingsModal } from '../../components/settings/settings';
-import { SourceSelector } from '../../components/source-selector/source-selector';
+import FinishPage from '../ving-installer/ving-finish';
+import { ReducedFlashingInfos } from '../reduced-flashing-infos/reduced-flashing-infos';
+import { SourceSelector } from './ving-source-selector';
 import type { SourceMetadata } from '../../../../shared/typings/source-selector';
 import * as flashState from '../../models/flash-state';
 import * as selectionState from '../../models/selection-state';
 import * as settings from '../../models/settings';
 import { observe } from '../../models/store';
 import { open as openExternal } from '../../os/open-external/services/open-external';
-import {
-	IconButton as BaseIcon,
-	ThemedProvider,
-} from '../../styled-components';
+import { ThemedProvider } from '../../styled-components';
 
 import {
 	TargetSelector,
 	getDriveListLabel,
-} from '../../components/target-selector/target-selector';
-import { FlashStep } from './Flash';
+} from '../target-selector/target-selector';
+import { FlashStep } from '../../pages/main/Flash';
 
-import EtcherSvg from '../../../assets/etcher.svg';
-import { SafeWebview } from '../../components/safe-webview/safe-webview';
-
-const Icon = styled(BaseIcon)`
-	margin-right: 20px;
-`;
+import EtcherSvg from '../../../assets/ving_os.svg';
 
 function getDrivesTitle() {
 	const drives = selectionState.getSelectedDrives();
@@ -174,7 +145,10 @@ export class MainPage extends React.Component<
 			>
 				{notFlashingOrSplitView && (
 					<>
-						<SourceSelector flashing={this.state.isFlashing} />
+						<SourceSelector
+							flashing={this.state.isFlashing}
+							current={this.state.current}
+						/>
 						<Flex>
 							<StepBorder disabled={shouldDriveStepBeDisabled} left />
 						</Flex>
@@ -220,21 +194,6 @@ export class MainPage extends React.Component<
 						/>
 					</Flex>
 				)}
-				{this.state.isFlashing && this.state.featuredProjectURL && (
-					<SafeWebview
-						src={this.state.featuredProjectURL}
-						onWebviewShow={(isWebviewShowing: boolean) => {
-							this.setState({ isWebviewShowing });
-						}}
-						style={{
-							position: 'absolute',
-							right: 0,
-							bottom: 0,
-							width: '63.8vw',
-							height: '100vh',
-						}}
-					/>
-				)}
 
 				<FlashStep
 					width={this.state.isWebviewShowing ? '220px' : '200px'}
@@ -279,57 +238,17 @@ export class MainPage extends React.Component<
 						zIndex: 2,
 					}}
 				>
-					<Flex width="100%" />
 					<Flex width="100%" alignItems="center" justifyContent="center">
 						<EtcherSvg
-							width="123px"
-							height="22px"
 							style={{
 								cursor: 'pointer',
 							}}
-							onClick={() =>
-								openExternal('https://www.balena.io/etcher?ref=etcher_footer')
-							}
+							onClick={() => openExternal('https://www.letsving.com/')}
 							tabIndex={100}
 						/>
 					</Flex>
-
-					<Flex width="100%" alignItems="center" justifyContent="flex-end">
-						<Icon
-							icon={<CogSvg height="1em" fill="currentColor" />}
-							plain
-							tabIndex={5}
-							onClick={() => this.setState({ hideSettings: false })}
-							style={{
-								// Make touch events click instead of dragging
-								WebkitAppRegion: 'no-drag',
-							}}
-						/>
-						{!settings.getSync('disableExternalLinks') && (
-							<Icon
-								icon={<QuestionCircleSvg height="1em" fill="currentColor" />}
-								onClick={() =>
-									openExternal(
-										selectionState.getImage()?.supportUrl ||
-											'https://github.com/balena-io/etcher/blob/master/docs/SUPPORT.md',
-									)
-								}
-								tabIndex={6}
-								style={{
-									// Make touch events click instead of dragging
-									WebkitAppRegion: 'no-drag',
-								}}
-							/>
-						)}
-					</Flex>
 				</Flex>
-				{this.state.hideSettings ? null : (
-					<SettingsModal
-						toggleModal={(value: boolean) => {
-							this.setState({ hideSettings: !value });
-						}}
-					/>
-				)}
+
 				{this.state.current === 'main'
 					? this.renderMain()
 					: this.renderSuccess()}

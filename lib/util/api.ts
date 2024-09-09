@@ -23,7 +23,7 @@ import type { MultiDestinationProgress } from 'etcher-sdk/build/multi-write';
 import { toJSON } from '../shared/errors';
 import { GENERAL_ERROR, SUCCESS } from '../shared/exit-codes';
 import type { WriteOptions } from './types/types';
-import { write, cleanup } from './child-writer';
+import { write, cleanup } from '../gui/app/components/ving-installer/ving-child-writer';
 import { startScanning } from './scanner';
 import { getSourceMetadata } from './source-metadata';
 import type { DrivelistDrive } from '../shared/drive-constraints';
@@ -273,6 +273,8 @@ setup().then(({ emit, log }: EmitLog) => {
 	};
 
 	emitState = (state) => {
+		emitLog(`Emitting State:" + ${JSON.stringify(state, null, 2)}`)
+        console.log("Emitting State:" + JSON.stringify(state, null, 2))
 		emit('state', state);
 	};
 

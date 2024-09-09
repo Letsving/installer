@@ -10,5 +10,5 @@ jobs:
         with:
           identifier: Balena.Etcher
           # matches something like "balenaEtcher-1.19.0.Setup.exe"
-          installers-regex: 'vingFlasher-[\d.-]+\.Setup.exe$'
+          installers-regex: 'vingInstaller-[\d.-]+\.Setup.exe$'
           token: ${{ secrets.WINGET_PAT }}
