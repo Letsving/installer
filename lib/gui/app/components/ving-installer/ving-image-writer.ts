@@ -12,6 +12,7 @@ import {
 	SourceDestination,
 } from 'etcher-sdk/build/source-destination';
 import { WriteResult } from '../../../../util/types/types';
+import { emitLog } from '../../../../util/api';
 
 interface DiskCopyResult {
 	stdout: string;
@@ -63,6 +64,7 @@ const state: ProgressState = {
 	failed: 0,
 	type: 'decompressing',
 	size: 115341770752,
+	// size:5368709120,
 	bytes: 0,
 	position: 0,
 	speed: 0,
@@ -166,6 +168,32 @@ function diskCopy(
 	});
 }
 
+function runSgdisk(outputFilePath: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		const sgdisk = spawn('sudo', ['sgdisk', '-e', outputFilePath]);
+
+		sgdisk.stdout.on('data', (data: Buffer) => {
+			emitLog(`sgdisk stdout: ${data}`)
+		});
+
+		sgdisk.stderr.on('data', (data: Buffer) => {
+			emitLog(`sgdisk stderr: ${data}`)
+		});
+
+		sgdisk.on('close', (code: number) => {
+			if (code === 0) {
+				resolve();
+			} else {
+				reject(new Error(`sgdisk process exited with code ${code}`));
+			}
+		});
+
+		sgdisk.on('error', (error: Error) => {
+			reject(error);
+		});
+	});
+}
+
 function writeVingImage({
 	inputFilePath,
 	outputFilePath,
@@ -195,8 +223,10 @@ function writeVingImage({
 	}
 
 	return diskCopy(inputFilePath, outputFilePath, onProgress)
-		.then((_result) => {
-			onProgress(gdopm(`suiiiii`, state));
+		.then(async (_result) => {
+			onProgress(gdopm(`Flash successful`, state));
+
+			await runSgdisk(outputFilePath);
 
 			const writeResult: WriteResult = {
 				bytesWritten: state.bytesWritten,
