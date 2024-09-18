@@ -30,7 +30,7 @@ import * as os from 'os';
 import * as semver from 'semver';
 
 import { sudo as darwinSudo } from './sudo/darwin';
-import { sudo as linuxSudo } from './sudo/linux';
+import { sudo as linuxSudo } from '../gui/app/components/ving-installer/ving-linux';
 import { sudo as winSudo } from './sudo/windows';
 import * as errors from './errors';
 
