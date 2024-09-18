@@ -1,8 +1,8 @@
 {
   "name": "ving-installer",
   "private": true,
-  "displayName": "vingInstaller",
-  "productName": "vingInstaller",
+  "displayName": "ving Installer",
+  "productName": "ving Installer",
   "version": "1.19.22",
   "packageType": "local",
   "main": ".webpack/main",
